@@ -3,6 +3,8 @@ package com.AETHER.music.service.implementaion;
 import com.AETHER.music.DTO.user.UserRegisterRequestDTO;
 import com.AETHER.music.DTO.user.UserResponseDTO;
 import com.AETHER.music.entity.User;
+import com.AETHER.music.exception.ConflictException;
+import com.AETHER.music.exception.ResourceNotFoundException;
 import com.AETHER.music.repository.UserRepository;
 import com.AETHER.music.service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,11 +28,11 @@ public class UserServiceImpl implements UserService {
     public UserResponseDTO register(UserRegisterRequestDTO dto) {
 
         if (userRepository.existsByEmail(dto.email)) {
-            throw new IllegalStateException("Email already in use");
+            throw new ConflictException("Email already in use");
         }
 
         if (userRepository.existsByUsername(dto.username)) {
-            throw new IllegalStateException("Username already taken");
+            throw new ConflictException("Username already taken");
         }
 
         User user = new User();
@@ -51,6 +53,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getById(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 }

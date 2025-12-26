@@ -1,6 +1,8 @@
 package com.AETHER.music.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.OffsetDateTime;
 
@@ -9,6 +11,8 @@ import java.time.OffsetDateTime;
         name = "track_files",
         uniqueConstraints = @UniqueConstraint(columnNames = {"track_id", "quality"})
 )
+@Getter
+@Setter
 public class TrackFile {
 
     @Id

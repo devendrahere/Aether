@@ -7,6 +7,7 @@ import com.AETHER.music.DTO.track.TrackSummaryDTO;
 import com.AETHER.music.entity.Playlist;
 import com.AETHER.music.entity.Track;
 import com.AETHER.music.entity.User;
+import com.AETHER.music.exception.ResourceNotFoundException;
 import com.AETHER.music.repository.PlaylistRepository;
 import com.AETHER.music.repository.PlaylistTrackRepository;
 import com.AETHER.music.service.PlaylistService;
@@ -48,7 +49,7 @@ public class PlaylistServiceImpl implements PlaylistService {
     public PlaylistDetailDTO getPlaylist(Long playlistId) {
 
         Playlist playlist = playlistRepository.findByIdAndDeletedAtIsNull(playlistId)
-                .orElseThrow(() -> new IllegalArgumentException("Playlist not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Playlist not found"));
 
         PlaylistDetailDTO dto = new PlaylistDetailDTO();
         dto.id = playlist.getId();
