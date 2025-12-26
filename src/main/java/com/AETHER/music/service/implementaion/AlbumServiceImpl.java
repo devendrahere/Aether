@@ -4,6 +4,7 @@ import com.AETHER.music.DTO.album.AlbumDetailDTO;
 import com.AETHER.music.DTO.artist.ArtistDTO;
 import com.AETHER.music.DTO.track.TrackSummaryDTO;
 import com.AETHER.music.entity.Album;
+import com.AETHER.music.exception.ResourceNotFoundException;
 import com.AETHER.music.repository.AlbumRepository;
 import com.AETHER.music.repository.TrackRepository;
 import com.AETHER.music.service.AlbumService;
@@ -27,7 +28,7 @@ public class AlbumServiceImpl implements AlbumService {
     public AlbumDetailDTO getAlbum(Long albumId) {
 
         Album album = albumRepository.findById(albumId)
-                .orElseThrow(() -> new IllegalArgumentException("Album not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Album not found"));
 
         AlbumDetailDTO dto = new AlbumDetailDTO();
         dto.id = album.getId();
