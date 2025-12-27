@@ -1,15 +1,17 @@
 package com.AETHER.music.controller;
 
+import com.AETHER.music.DTO.user.UserLoginRequestDTO;
+import com.AETHER.music.DTO.user.UserLoginResponseDTO;
 import com.AETHER.music.DTO.user.UserRegisterRequestDTO;
 import com.AETHER.music.DTO.user.UserResponseDTO;
 import com.AETHER.music.service.UserService;
 import jakarta.validation.Valid;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+@RestController
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
@@ -23,5 +25,12 @@ public class UserController {
             @Valid @RequestBody UserRegisterRequestDTO registerRequestDTO
     ){
         return userService.register(registerRequestDTO);
+    }
+
+    @PostMapping("/login")
+    public UserLoginResponseDTO login(
+            @RequestBody UserLoginRequestDTO requestDTO
+    ){
+        return userService.login(requestDTO);
     }
 }
