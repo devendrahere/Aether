@@ -8,11 +8,19 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class TrackSummaryDTO {
-    public Long id;
-    public String title;
-    public Integer durationSec;
-    public ArtistDTO artist;
+
+    private Long id;
+    private String title;
+    private Integer durationSec;
+    private ArtistDTO artist;
+
+    // 🔥 REQUIRED for JPQL projection
+    public TrackSummaryDTO(Long id, String title, Integer durationSec) {
+        this.id = id;
+        this.title = title;
+        this.durationSec = durationSec;
+    }
 }

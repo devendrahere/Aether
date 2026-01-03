@@ -49,10 +49,10 @@ public class AlbumServiceImpl implements AlbumService {
                 .stream()
                 .map(t -> {
                     TrackSummaryDTO ts = new TrackSummaryDTO();
-                    ts.id = t.getId();
-                    ts.title = t.getTitle();
-                    ts.durationSec = t.getDurationSec();
-                    ts.artist = artistDto;
+                    ts.setId( t.getId());
+                    ts.setTitle( t.getTitle());
+                    ts.setDurationSec( t.getDurationSec());
+                    ts.setArtist( artistDto);
                     return ts;
                 })
                 .toList();

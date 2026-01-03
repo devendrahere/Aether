@@ -84,16 +84,16 @@ public class TrackServiceImpl implements TrackService {
                 .stream()
                 .map(track -> {
                     TrackSummaryDTO dto = new TrackSummaryDTO();
-                    dto.id = track.getId();
-                    dto.title = track.getTitle();
-                    dto.durationSec = track.getDurationSec();
+                    dto.setId( track.getId());
+                    dto.setTitle( track.getTitle());
+                    dto.setDurationSec( track.getDurationSec());
 
                     Artist artist = track.getArtist();
                     ArtistDTO artistDto = new ArtistDTO();
                     artistDto.id = artist.getId();
                     artistDto.name = artist.getName();
                     artistDto.country = artist.getCountry();
-                    dto.artist = artistDto;
+                    dto.setArtist( artistDto);
 
                     return dto;
                 })
@@ -106,9 +106,9 @@ public class TrackServiceImpl implements TrackService {
                 .stream()
                 .map(track -> {
                     TrackSummaryDTO dto = new TrackSummaryDTO();
-                    dto.id = track.getId();
-                    dto.title = track.getTitle();
-                    dto.durationSec = track.getDurationSec();
+                    dto.setId( track.getId());
+                    dto.setTitle( track.getTitle());
+                    dto.setDurationSec(track.getDurationSec());
 
                     if (track.getArtist() != null) {
                         ArtistDTO artistDTO = new ArtistDTO();
@@ -116,7 +116,7 @@ public class TrackServiceImpl implements TrackService {
                         artistDTO.name = track.getArtist().getName();
                         artistDTO.country = track.getArtist().getCountry();
 
-                        dto.artist = artistDTO;
+                        dto.setArtist( artistDTO);
                     }
 
                     return dto;

@@ -24,9 +24,6 @@ public class UserLibraryController {
     public List<TrackSummaryDTO> likedTracks(
             @AuthenticationPrincipal CustomUserDetails user) {
 
-        return reactionService.getLikedTracks(user.getUser().getId())
-                .stream()
-                .map(trackMapper::toSummaryDTO)
-                .toList();
+        return reactionService.getLikedTracks(user.getUser().getId());
     }
 }

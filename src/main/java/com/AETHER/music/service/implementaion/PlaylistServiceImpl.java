@@ -46,6 +46,7 @@ public class PlaylistServiceImpl implements PlaylistService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PlaylistDetailDTO getPlaylist(Long playlistId) {
 
         Playlist playlist = playlistRepository.findByIdAndDeletedAtIsNull(playlistId)
@@ -57,23 +58,7 @@ public class PlaylistServiceImpl implements PlaylistService {
         dto.description = playlist.getDescription();
         dto.isPublic = playlist.isPublic();
 
-        dto.tracks = playlistTrackRepository
-                .findByPlaylistIdOrderByPositionAsc(playlistId)
-                .stream()
-                .map(pt -> {
-                    PlaylistTrackDTO ptd = new PlaylistTrackDTO();
-                    ptd.position = pt.getPosition();
-
-                    Track t = pt.getTrack();
-                    TrackSummaryDTO ts = new TrackSummaryDTO();
-                    ts.id = t.getId();
-                    ts.title = t.getTitle();
-                    ts.durationSec = t.getDurationSec();
-
-                    ptd.track = ts;
-                    return ptd;
-                })
-                .toList();
+        dto.tracks = playlistTrackRepository.findPlaylistTrackDTOs(playlistId);
 
         return dto;
     }
