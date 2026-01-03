@@ -2,12 +2,14 @@ package com.AETHER.music.controller;
 
 import com.AETHER.music.DTO.playlist.PlaylistCreateRequestDTO;
 import com.AETHER.music.DTO.playlist.PlaylistDetailDTO;
+import com.AETHER.music.auth.CustomUserDetails;
 import com.AETHER.music.service.PlaylistService;
 import jakarta.validation.Valid;
-import org.springframework.stereotype.Controller;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
+@RestController
 @RequestMapping("/playlists")
 public class PlaylistController {
     private final PlaylistService playlistService;
@@ -16,15 +18,16 @@ public class PlaylistController {
     }
 
     @PostMapping
-    public void creatplaylist(
-            @RequestParam Long userId,
+    public void createPlaylist(
+            @AuthenticationPrincipal CustomUserDetails user,
             @Valid @RequestBody PlaylistCreateRequestDTO dto
-    ){
-        playlistService.createPlaylist(userId,dto);
+    ) {
+        playlistService.createPlaylist(user.getUser().getId(), dto);
     }
 
+
     @GetMapping("/{id}")
-    public PlaylistDetailDTO gtePlaylist(@PathVariable Long id){
+    public PlaylistDetailDTO getPlaylist(@PathVariable Long id){
         return playlistService.getPlaylist(id);
     }
 }

@@ -1,6 +1,7 @@
 package com.AETHER.music.service.implementaion;
 
 import com.AETHER.music.DTO.album.AlbumDetailDTO;
+import com.AETHER.music.DTO.album.AlbumSummaryDTO;
 import com.AETHER.music.DTO.artist.ArtistDTO;
 import com.AETHER.music.DTO.track.TrackSummaryDTO;
 import com.AETHER.music.entity.Album;
@@ -10,6 +11,9 @@ import com.AETHER.music.repository.TrackRepository;
 import com.AETHER.music.service.AlbumService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -54,5 +58,27 @@ public class AlbumServiceImpl implements AlbumService {
                 .toList();
 
         return dto;
+    }
+
+    @Override
+    public List<AlbumSummaryDTO> getAllAlbums() {
+        return albumRepository.findAll()
+                .stream()
+                .map(album -> {
+                    AlbumSummaryDTO dto = new AlbumSummaryDTO();
+                    dto.id = album.getId();
+                    dto.title = album.getTitle();
+                    dto.releaseYear = album.getReleaseYear();
+                    if (album.getArtist() != null) {
+                        ArtistDTO artistDTO = new ArtistDTO();
+                        artistDTO.id = album.getArtist().getId();
+                        artistDTO.name = album.getArtist().getName();
+                        artistDTO.country = album.getArtist().getCountry();
+
+                        dto.artist = artistDTO;
+                    }
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 }

@@ -5,28 +5,31 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.OffsetDateTime;
-
 @Entity
-@Table(name = "user_track_reactions")
-@IdClass(UserTrackReactionId.class)
-@Getter
-@Setter
+@Table(
+        name = "user_track_reactions",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "track_id"})
+)
+@Getter @Setter
 public class UserTrackReaction {
 
-    @Id
+    @EmbeddedId
+    private UserTrackReactionId id;
+
     @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("userId")
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Id
     @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("trackId")
     @JoinColumn(name = "track_id")
     private Track track;
 
-    @Column(name = "reaction_type", nullable = false, length = 20)
-    private String reactionType;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private ReactionType reactionType;
 
-    @Column(name = "created_at", nullable = false)
+    @Column(nullable = false, updatable = false)
     private OffsetDateTime createdAt = OffsetDateTime.now();
 }
-

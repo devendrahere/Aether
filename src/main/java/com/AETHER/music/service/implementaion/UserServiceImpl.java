@@ -73,24 +73,35 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserLoginResponseDTO login(UserLoginRequestDTO dto) {
-        Authentication authentication=authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        dto.email,
-                        dto.password
-                )
-        );
+        try {
+            User user = userRepository.findByEmail(dto.email.trim())
+                    .orElseThrow(() -> new UnauthorizedException("Invalid email or password"));
 
-        CustomUserDetails userDetails= (CustomUserDetails) authentication.getPrincipal();
+            Authentication authentication =
+                    authenticationManager.authenticate(
+                            new UsernamePasswordAuthenticationToken(
+                                    user.getUsername(),   // 🔥 canonical
+                                    dto.password
+                            )
+                    );
 
-        String token =jwtService.generateToken(userDetails);
 
-        User user= userDetails.getUser();
+            CustomUserDetails userDetails =
+                    (CustomUserDetails) authentication.getPrincipal();
 
-        UserLoginResponseDTO responseDTO=new UserLoginResponseDTO();
-        responseDTO.token=token;
-        responseDTO.userId=user.getId();
-        responseDTO.username=user.getUsername();
+            String token = jwtService.generateToken(userDetails);
 
-        return responseDTO;
+
+            UserLoginResponseDTO response = new UserLoginResponseDTO();
+            response.token = token;
+            response.userId = user.getId();
+            response.username = user.getUsername();
+
+            return response;
+
+        } catch (Exception ex) {
+            throw new UnauthorizedException("Invalid email or password");
+        }
     }
+
 }

@@ -8,4 +8,6 @@ import java.util.List;
 public interface TrackService {
     TrackDetailDTO getTrack(Long trackId);
     List<TrackSummaryDTO> search(String query);
+
+    List<TrackSummaryDTO> getAllTracks();
 }

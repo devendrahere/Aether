@@ -1,14 +1,12 @@
 package com.AETHER.music.controller;
 
 import com.AETHER.music.DTO.playevent.PlayEventRequestDTO;
+import com.AETHER.music.auth.CustomUserDetails;
 import com.AETHER.music.service.PlayEventService;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
-@Controller
+@RestController
 @RequestMapping("/play-event")
 public class PlayEventController {
     private final PlayEventService playEventService;
@@ -19,9 +17,18 @@ public class PlayEventController {
 
     @PostMapping
     public void record(
-            @RequestParam(required = false) Long userId,
+            Authentication authentication,
             @RequestBody PlayEventRequestDTO dto
     ){
-        playEventService.record(dto,userId);
+        Long userId = null;
+
+        if (authentication != null && authentication.isAuthenticated()) {
+            CustomUserDetails user =
+                    (CustomUserDetails) authentication.getPrincipal();
+            userId = user.getUser().getId();
+        }
+
+        playEventService.record(dto, userId);
     }
+
 }

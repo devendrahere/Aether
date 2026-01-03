@@ -21,3 +21,6 @@ security:
   jwt:
     secret: ${JWT_SECRET}
     expirationMills: 86400000
+music:
+  storage:
+    base-path: C:\Users\deven\OneDrive\Documents\Code\MUSIC

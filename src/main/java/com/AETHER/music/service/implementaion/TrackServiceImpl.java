@@ -99,4 +99,30 @@ public class TrackServiceImpl implements TrackService {
                 })
                 .toList();
     }
+
+    @Override
+    public List<TrackSummaryDTO> getAllTracks() {
+        return trackRepository.findAll()
+                .stream()
+                .map(track -> {
+                    TrackSummaryDTO dto = new TrackSummaryDTO();
+                    dto.id = track.getId();
+                    dto.title = track.getTitle();
+                    dto.durationSec = track.getDurationSec();
+
+                    if (track.getArtist() != null) {
+                        ArtistDTO artistDTO = new ArtistDTO();
+                        artistDTO.id = track.getArtist().getId();
+                        artistDTO.name = track.getArtist().getName();
+                        artistDTO.country = track.getArtist().getCountry();
+
+                        dto.artist = artistDTO;
+                    }
+
+                    return dto;
+                })
+                .toList();
+    }
+
+
 }
