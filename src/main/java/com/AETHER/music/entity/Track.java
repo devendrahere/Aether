@@ -36,6 +36,13 @@ public class Track {
     @Column(name = "created_at", nullable = false)
     private OffsetDateTime createdAt = OffsetDateTime.now();
 
+
+    public Track(Long id) {
+        this.id = id;
+    }
+
+    public Track() {}
+
     // getters/setters
 }
 

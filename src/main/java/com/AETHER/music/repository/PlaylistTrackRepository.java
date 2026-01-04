@@ -1,5 +1,6 @@
 package com.AETHER.music.repository;
 
+import com.AETHER.music.DTO.playlist.PlaylistSummaryDTO;
 import com.AETHER.music.DTO.playlist.PlaylistTrackDTO;
 import com.AETHER.music.entity.PlaylistTrack;
 import com.AETHER.music.entity.PlaylistTrackId;
@@ -13,22 +14,26 @@ import java.util.List;
 public interface PlaylistTrackRepository
         extends JpaRepository<PlaylistTrack, PlaylistTrackId> {
 
+    boolean existsByPlaylistIdAndTrackId(Long playlistId, Long trackId);
+
     void deleteByPlaylistIdAndTrackId(Long playlistId, Long trackId);
 
     @Query("""
-        select new com.AETHER.music.DTO.playlist.PlaylistTrackDTO(
-            pt.position,
-            new com.AETHER.music.DTO.track.TrackSummaryDTO(
-                t.id,
-                t.title,
-                t.durationSec
-            )
+        SELECT new com.AETHER.music.DTO.playlist.PlaylistTrackDTO(
+            t.id,
+            t.title,
+            t.durationSec,
+            a.id,
+            a.name
         )
-        from PlaylistTrack pt
-        join pt.track t
-        where pt.playlist.id = :playlistId
-        order by pt.position asc
+        FROM PlaylistTrack pt
+        JOIN pt.track t
+        JOIN t.artist a
+        WHERE pt.playlist.id = :playlistId
     """)
     List<PlaylistTrackDTO> findPlaylistTrackDTOs(Long playlistId);
+
+    int countByPlaylistId(Long playlistId);
 }
+
 

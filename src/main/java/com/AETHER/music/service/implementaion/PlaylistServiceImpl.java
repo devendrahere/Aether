@@ -2,18 +2,25 @@ package com.AETHER.music.service.implementaion;
 
 import com.AETHER.music.DTO.playlist.PlaylistCreateRequestDTO;
 import com.AETHER.music.DTO.playlist.PlaylistDetailDTO;
+import com.AETHER.music.DTO.playlist.PlaylistSummaryDTO;
 import com.AETHER.music.DTO.playlist.PlaylistTrackDTO;
 import com.AETHER.music.DTO.track.TrackSummaryDTO;
 import com.AETHER.music.entity.Playlist;
+import com.AETHER.music.entity.PlaylistTrack;
 import com.AETHER.music.entity.Track;
 import com.AETHER.music.entity.User;
 import com.AETHER.music.exception.ResourceNotFoundException;
+import com.AETHER.music.exception.UnauthorizedException;
 import com.AETHER.music.repository.PlaylistRepository;
 import com.AETHER.music.repository.PlaylistTrackRepository;
 import com.AETHER.music.service.PlaylistService;
 import com.AETHER.music.service.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.util.List;
 
 @Service
 @Transactional
@@ -62,4 +69,61 @@ public class PlaylistServiceImpl implements PlaylistService {
 
         return dto;
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PlaylistSummaryDTO> getUserPlaylists(Long userId) {
+        return playlistRepository.findPlaylistSummaries(userId);
+    }
+
+    @Override
+    public void addTrack(Long userId, Long playlistId, Long trackId) {
+
+        Playlist playlist = playlistRepository
+                .findByIdAndOwnerIdAndDeletedAtIsNull(playlistId, userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Playlist not found"));
+
+        if (playlistTrackRepository.existsByPlaylistIdAndTrackId(playlistId, trackId)) {
+            return; // already exists, idempotent
+        }
+
+        int nextPosition =
+                playlistTrackRepository.countByPlaylistId(playlistId) + 1;
+
+        PlaylistTrack pt = new PlaylistTrack();
+        pt.setPlaylist(playlist);
+        pt.setTrack(new Track(trackId));
+        pt.setPosition(nextPosition);        // 🔥 THIS WAS MISSING
+        pt.setAddedAt(OffsetDateTime.now());
+
+        playlistTrackRepository.save(pt);
+    }
+
+
+
+    @Override
+    public void removeTrack(Long userId, Long playlistId, Long trackId) {
+
+        playlistRepository
+                .findByIdAndOwnerIdAndDeletedAtIsNull(playlistId, userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Playlist not found"));
+
+        playlistTrackRepository.deleteByPlaylistIdAndTrackId(playlistId, trackId);
+    }
+
+    @Override
+    @Transactional
+    public void deletePlaylist(Long userId, Long playlistId) {
+
+        Playlist playlist = playlistRepository.findByIdAndDeletedAtIsNull(playlistId)
+                .orElseThrow(() -> new ResourceNotFoundException("Playlist not found"));
+
+        if (!playlist.getOwner().getId().equals(userId)) {
+            throw new UnauthorizedException("You do not own this playlist");
+        }
+
+        playlist.setDeletedAt(OffsetDateTime.now());
+        playlistRepository.save(playlist);
+    }
+
 }

@@ -1,39 +1,35 @@
-package com.AETHER.music.exception;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    @ExceptionHandler(ResourceNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String ,String> handleNotFound(ResourceNotFoundException ex){
-        return Map.of("error",ex.getMessage());
+
+    // existing handlers stay as-is
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<?> handleAccessDenied(AccessDeniedException e) {
+        return ResponseEntity.status(403)
+                .body(Map.of("error", "Access denied"));
     }
 
-    @ExceptionHandler(ConflictException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
-    private Map<String ,String > handleConflict(ConflictException e){
-        return Map.of("error",e.getMessage());
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<?> handleAuth(AuthenticationException e) {
+        return ResponseEntity.status(401)
+                .body(Map.of("error", "Authentication required"));
     }
 
-    @ExceptionHandler(UnauthorizedException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    private Map<String ,String > handleUnauthorized(UnauthorizedException e){
-        return Map.of("error",e.getMessage());
-    }
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    private Map<String ,String> handleValidation(MethodArgumentNotValidException e){
-        return Map.of(
-                "error",
-                e.getBindingResult().getFieldErrors().get(0).getDefaultMessage()
-        );
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<?> handleFallback(Exception e) {
+        // LOG THIS IN REAL APPS
+        return ResponseEntity.status(500)
+                .body(Map.of(
+                        "error", "Internal server error",
+                        "type", e.getClass().getSimpleName()
+                ));
     }
 }
