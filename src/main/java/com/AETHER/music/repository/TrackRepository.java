@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import com.AETHER.music.DTO.track.TrackSummaryDTO;
+
 
 import java.util.List;
 
@@ -21,4 +23,16 @@ public interface TrackRepository extends JpaRepository<Track, Long> {
         where lower(t.title) like lower(concat('%', :q, '%'))
     """)
     List<Track> search(@Param("q") String query);
+
+    @Query("""
+    select new com.AETHER.music.DTO.track.TrackSummaryDTO(
+        t.id,
+        t.title,
+        t.durationSec
+    )
+    from Track t
+    join t.artist a
+    where t.id in :ids
+""")
+    List<TrackSummaryDTO> findTrackSummariesByIds(@Param("ids") List<Long> ids);
 }

@@ -20,12 +20,13 @@ public class PlayEventController {
             Authentication authentication,
             @RequestBody PlayEventRequestDTO dto
     ){
+        System.out.println(">>> PlayEventController HIT");
         Long userId = null;
 
         if (authentication != null && authentication.isAuthenticated()) {
             CustomUserDetails user =
                     (CustomUserDetails) authentication.getPrincipal();
-            userId = user.getUser().getId();
+            userId = user.getId();
         }
 
         playEventService.record(dto, userId);

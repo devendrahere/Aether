@@ -50,14 +50,15 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.GET,
                                 "/tracks/**",
-                                "/albums/**"
+                                "/albums/**",
+                                "/home"
                         ).permitAll()
-
+                        .requestMatchers(HttpMethod.POST, "/play-event").hasRole("USER")
                         .requestMatchers(
                                 "/tracks/*/stream"
                         ).permitAll()
 
-                        .anyRequest().authenticated()
+                        .anyRequest().hasRole("USER")
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 

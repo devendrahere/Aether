@@ -17,10 +17,23 @@ public class TrackSummaryDTO {
     private Integer durationSec;
     private ArtistDTO artist;
 
-    // 🔥 REQUIRED for JPQL projection
     public TrackSummaryDTO(Long id, String title, Integer durationSec) {
         this.id = id;
         this.title = title;
         this.durationSec = durationSec;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof TrackSummaryDTO)) return false;
+        TrackSummaryDTO that = (TrackSummaryDTO) o;
+        return id != null && id.equals(that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
+    }
 }
+

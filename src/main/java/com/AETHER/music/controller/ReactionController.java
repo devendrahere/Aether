@@ -23,7 +23,7 @@ public class ReactionController {
             return ResponseEntity.status(401).build();
         }
 
-        reactionService.likeTrack(user.getUser().getId(), trackId);
+        reactionService.likeTrack(user.getId(), trackId);
         return ResponseEntity.ok().build();
     }
 
@@ -37,7 +37,7 @@ public class ReactionController {
         CustomUserDetails user =
                 (CustomUserDetails) authentication.getPrincipal();
 
-        reactionService.unlikeTrack(user.getUser().getId(), trackId);
+        reactionService.unlikeTrack(user.getId(), trackId);
         return ResponseEntity.noContent().build();
     }
 }

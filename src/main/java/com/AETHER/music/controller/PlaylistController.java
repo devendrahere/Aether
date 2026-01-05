@@ -28,7 +28,7 @@ public class PlaylistController {
             @AuthenticationPrincipal CustomUserDetails user,
             @Valid @RequestBody PlaylistCreateRequestDTO dto
     ) {
-        playlistService.createPlaylist(user.getUser().getId(), dto);
+        playlistService.createPlaylist(user.getId(), dto);
         return ResponseEntity.status(201)
                 .body(Map.of("status", "created"));
     }
@@ -42,7 +42,7 @@ public class PlaylistController {
     public List<PlaylistSummaryDTO> myPlaylists(
             @AuthenticationPrincipal CustomUserDetails user
     ) {
-        return playlistService.getUserPlaylists(user.getUser().getId());
+        return playlistService.getUserPlaylists(user.getId());
     }
 
     @PostMapping("/{playlistId}/tracks/{trackId}")
@@ -52,7 +52,7 @@ public class PlaylistController {
             @AuthenticationPrincipal CustomUserDetails user
     ) {
         playlistService.addTrack(
-                user.getUser().getId(),
+                user.getId(),
                 playlistId,
                 trackId
         );
@@ -73,7 +73,7 @@ public class PlaylistController {
             @AuthenticationPrincipal CustomUserDetails user
     ) {
         playlistService.removeTrack(
-                user.getUser().getId(),
+                user.getId(),
                 playlistId,
                 trackId
         );
@@ -93,7 +93,7 @@ public class PlaylistController {
             @AuthenticationPrincipal CustomUserDetails user
     ) {
         playlistService.deletePlaylist(
-                user.getUser().getId(),
+                user.getId(),
                 playlistId
         );
 
