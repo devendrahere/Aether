@@ -1,7 +1,14 @@
 package com.AETHER.music.DTO.artist;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+@AllArgsConstructor
 public class ArtistDTO {
-    public Long id;
-    public String name;
-    public String country;
+    private Long id;
+    private String name;
+    private String country;
 }

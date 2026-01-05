@@ -35,50 +35,70 @@ public class AlbumServiceImpl implements AlbumService {
                 .orElseThrow(() -> new ResourceNotFoundException("Album not found"));
 
         AlbumDetailDTO dto = new AlbumDetailDTO();
-        dto.id = album.getId();
-        dto.title = album.getTitle();
-        dto.releaseYear = album.getReleaseYear();
+        dto.setId(album.getId());
+        dto.setTitle(album.getTitle());
+        dto.setReleaseYear(album.getReleaseYear());
 
-        ArtistDTO artistDto = new ArtistDTO();
-        artistDto.id = album.getArtist().getId();
-        artistDto.name = album.getArtist().getName();
-        artistDto.country = album.getArtist().getCountry();
-        dto.artist = artistDto;
+        // Album artist (still singular – correct)
+        ArtistDTO albumArtist = new ArtistDTO(
+                album.getArtist().getId(),
+                album.getArtist().getName(),
+                album.getArtist().getCountry()
+        );
+        dto.setArtist(albumArtist);
+        dto.setTracks(
+                trackRepository.findByAlbumId(albumId)
+                        .stream()
+                        .map(track -> {
+                            TrackSummaryDTO ts = new TrackSummaryDTO();
+                            ts.setId(track.getId());
+                            ts.setTitle(track.getTitle());
+                            ts.setDurationSec(track.getDurationSec());
 
-        dto.tracks = trackRepository.findByAlbumId(albumId)
-                .stream()
-                .map(t -> {
-                    TrackSummaryDTO ts = new TrackSummaryDTO();
-                    ts.setId( t.getId());
-                    ts.setTitle( t.getTitle());
-                    ts.setDurationSec( t.getDurationSec());
-                    ts.setArtist( artistDto);
-                    return ts;
-                })
-                .toList();
+                            ts.setArtists(
+                                    track.getArtists()
+                                            .stream()
+                                            .map(a -> new ArtistDTO(
+                                                    a.getId(),
+                                                    a.getName(),
+                                                    a.getCountry()
+                                            ))
+                                            .toList()
+                            );
+
+                            return ts;
+                        })
+                        .toList()
+        );
 
         return dto;
     }
 
+
     @Override
     public List<AlbumSummaryDTO> getAllAlbums() {
+
         return albumRepository.findAll()
                 .stream()
                 .map(album -> {
-                    AlbumSummaryDTO dto = new AlbumSummaryDTO();
-                    dto.id = album.getId();
-                    dto.title = album.getTitle();
-                    dto.releaseYear = album.getReleaseYear();
-                    if (album.getArtist() != null) {
-                        ArtistDTO artistDTO = new ArtistDTO();
-                        artistDTO.id = album.getArtist().getId();
-                        artistDTO.name = album.getArtist().getName();
-                        artistDTO.country = album.getArtist().getCountry();
 
-                        dto.artist = artistDTO;
+                    AlbumSummaryDTO dto = new AlbumSummaryDTO();
+                    dto.setId(album.getId());
+                    dto.setTitle(album.getTitle());
+                    dto.setReleaseYear(album.getReleaseYear());
+
+                    if (album.getArtist() != null) {
+                        dto.setArtist(
+                                new ArtistDTO(
+                                        album.getArtist().getId(),
+                                        album.getArtist().getName(),
+                                        album.getArtist().getCountry()
+                                )
+                        );
                     }
+
                     return dto;
                 })
-                .collect(Collectors.toList());
+                .toList();
     }
 }

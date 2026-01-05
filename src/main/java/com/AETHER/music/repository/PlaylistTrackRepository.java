@@ -1,6 +1,5 @@
 package com.AETHER.music.repository;
 
-import com.AETHER.music.DTO.playlist.PlaylistSummaryDTO;
 import com.AETHER.music.DTO.playlist.PlaylistTrackDTO;
 import com.AETHER.music.entity.PlaylistTrack;
 import com.AETHER.music.entity.PlaylistTrackId;
@@ -18,22 +17,15 @@ public interface PlaylistTrackRepository
 
     void deleteByPlaylistIdAndTrackId(Long playlistId, Long trackId);
 
-    @Query("""
-        SELECT new com.AETHER.music.DTO.playlist.PlaylistTrackDTO(
-            t.id,
-            t.title,
-            t.durationSec,
-            a.id,
-            a.name
-        )
-        FROM PlaylistTrack pt
-        JOIN pt.track t
-        JOIN t.artist a
-        WHERE pt.playlist.id = :playlistId
-    """)
-    List<PlaylistTrackDTO> findPlaylistTrackDTOs(Long playlistId);
-
     int countByPlaylistId(Long playlistId);
+
+    @Query("""
+        select distinct pt
+        from PlaylistTrack pt
+        join fetch pt.track t
+        join fetch t.artists
+        where pt.playlist.id = :playlistId
+        order by pt.position asc
+    """)
+    List<PlaylistTrack> findWithTrackAndArtistsByPlaylistId(Long playlistId);
 }
-
-

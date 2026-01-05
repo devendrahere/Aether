@@ -10,11 +10,11 @@ public class ArtistMapper {
     public ArtistDTO toDTO(Artist artist) {
         if (artist == null) return null;
 
-        ArtistDTO dto = new ArtistDTO();
-        dto.id = artist.getId();
-        dto.name = artist.getName();
-        dto.country = artist.getCountry();
-
-        return dto;
+        ArtistDTO artistDto = new ArtistDTO(
+                artist.getId(),
+                artist.getName(),
+                artist.getCountry()
+        );
+        return artistDto;
     }
 }

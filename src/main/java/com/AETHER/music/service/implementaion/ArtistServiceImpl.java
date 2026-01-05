@@ -24,11 +24,13 @@ public class ArtistServiceImpl implements ArtistService {
         return artistRepository.findByNameContainingIgnoreCase(query)
                 .stream()
                 .map(a -> {
-                    ArtistDTO dto = new ArtistDTO();
-                    dto.id = a.getId();
-                    dto.name = a.getName();
-                    dto.country = a.getCountry();
-                    return dto;
+                    ArtistDTO artistDto = new ArtistDTO(
+                            a.getId(),
+                            a.getName(),
+                            a.getCountry()
+                    );
+                    ;
+                    return artistDto;
                 })
                 .toList();
     }

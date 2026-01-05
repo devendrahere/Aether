@@ -11,7 +11,14 @@ import java.util.UUID;
 @Table(
         name = "play_events",
         indexes = {
-                @Index(name = "idx_play_events_user_time", columnList = "user_id, event_time desc")
+                @Index(
+                        name = "idx_play_events_user_time",
+                        columnList = "user_id, event_time desc"
+                ),
+                @Index(
+                        name = "idx_play_events_user_playlist_time",
+                        columnList = "user_id, playlist_id, event_time desc"
+                )
         }
 )
 @Getter
@@ -33,8 +40,12 @@ public class PlayEvent {
     @JoinColumn(name = "track_id", nullable = false)
     private Track track;
 
-    @Column(name = "event_type", nullable = false, length = 20)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "playlist_id")
+    private Playlist playlist; // nullable
+
     @Enumerated(EnumType.STRING)
+    @Column(name = "event_type", nullable = false, length = 20)
     private PlayEventType eventType;
 
     @Column(name = "event_time", nullable = false, updatable = false)
@@ -45,3 +56,4 @@ public class PlayEvent {
         this.eventTime = OffsetDateTime.now();
     }
 }
+

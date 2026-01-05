@@ -39,40 +39,47 @@ public class TrackServiceImpl implements TrackService {
                 .orElseThrow(() -> new ResourceNotFoundException("Track not found"));
 
         TrackDetailDTO dto = new TrackDetailDTO();
-        dto.id = track.getId();
-        dto.title = track.getTitle();
-        dto.durationSec = track.getDurationSec();
+        dto.setId(track.getId());
+        dto.setTitle(track.getTitle());
+        dto.setDurationSec(track.getDurationSec());
 
-        // Artist
-        Artist artist = track.getArtist();
-        ArtistDTO artistDto = new ArtistDTO();
-        artistDto.id = artist.getId();
-        artistDto.name = artist.getName();
-        artistDto.country = artist.getCountry();
-        dto.artist = artistDto;
+        // 🔥 Artists (FIX)
+        dto.setArtists(
+                track.getArtists()
+                        .stream()
+                        .map(a -> new ArtistDTO(
+                                a.getId(),
+                                a.getName(),
+                                a.getCountry()
+                        ))
+                        .toList()
+        );
 
         // Album (optional)
         if (track.getAlbum() != null) {
             Album album = track.getAlbum();
+
             AlbumSummaryDTO albumDto = new AlbumSummaryDTO();
-            albumDto.id = album.getId();
-            albumDto.title = album.getTitle();
-            albumDto.releaseYear = album.getReleaseYear();
-            albumDto.artist = artistDto;
-            dto.album = albumDto;
+            albumDto.setId(album.getId());
+            albumDto.setTitle(album.getTitle());
+            albumDto.setReleaseYear(album.getReleaseYear());
+
+            dto.setAlbum(albumDto);
         }
 
-        // Available files (qualities)
-        dto.availableFiles = trackFileRepository.findByTrackId(trackId)
-                .stream()
-                .map(tf -> {
-                    TrackFileDTO f = new TrackFileDTO();
-                    f.quality = tf.getQuality();
-                    f.codec = tf.getCodec();
-                    f.fileSizeBytes = tf.getFileSizeBytes();
-                    return f;
-                })
-                .toList();
+        // Available files
+        dto.setAvailableFiles(
+                trackFileRepository.findByTrackId(trackId)
+                        .stream()
+                        .map(tf -> {
+                            TrackFileDTO f = new TrackFileDTO();
+                            f.setQuality(tf.getQuality());
+                            f.setCodec(tf.getCodec());
+                            f.setFileSizeBytes(tf.getFileSizeBytes());
+                            return f;
+                        })
+                        .toList()
+        );
 
         return dto;
     }
@@ -83,17 +90,23 @@ public class TrackServiceImpl implements TrackService {
         return trackRepository.search(query)
                 .stream()
                 .map(track -> {
-                    TrackSummaryDTO dto = new TrackSummaryDTO();
-                    dto.setId( track.getId());
-                    dto.setTitle( track.getTitle());
-                    dto.setDurationSec( track.getDurationSec());
 
-                    Artist artist = track.getArtist();
-                    ArtistDTO artistDto = new ArtistDTO();
-                    artistDto.id = artist.getId();
-                    artistDto.name = artist.getName();
-                    artistDto.country = artist.getCountry();
-                    dto.setArtist( artistDto);
+                    TrackSummaryDTO dto = new TrackSummaryDTO();
+                    dto.setId(track.getId());
+                    dto.setTitle(track.getTitle());
+                    dto.setDurationSec(track.getDurationSec());
+
+                    // 🔥 Artists (FIX)
+                    dto.setArtists(
+                            track.getArtists()
+                                    .stream()
+                                    .map(a -> new ArtistDTO(
+                                            a.getId(),
+                                            a.getName(),
+                                            a.getCountry()
+                                    ))
+                                    .toList()
+                    );
 
                     return dto;
                 })
@@ -102,27 +115,30 @@ public class TrackServiceImpl implements TrackService {
 
     @Override
     public List<TrackSummaryDTO> getAllTracks() {
+
         return trackRepository.findAll()
                 .stream()
                 .map(track -> {
+
                     TrackSummaryDTO dto = new TrackSummaryDTO();
-                    dto.setId( track.getId());
-                    dto.setTitle( track.getTitle());
+                    dto.setId(track.getId());
+                    dto.setTitle(track.getTitle());
                     dto.setDurationSec(track.getDurationSec());
 
-                    if (track.getArtist() != null) {
-                        ArtistDTO artistDTO = new ArtistDTO();
-                        artistDTO.id = track.getArtist().getId();
-                        artistDTO.name = track.getArtist().getName();
-                        artistDTO.country = track.getArtist().getCountry();
-
-                        dto.setArtist( artistDTO);
-                    }
+                    // 🔥 Artists (FIX)
+                    dto.setArtists(
+                            track.getArtists()
+                                    .stream()
+                                    .map(a -> new ArtistDTO(
+                                            a.getId(),
+                                            a.getName(),
+                                            a.getCountry()
+                                    ))
+                                    .toList()
+                    );
 
                     return dto;
                 })
                 .toList();
     }
-
-
 }

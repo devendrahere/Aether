@@ -60,15 +60,44 @@ public class PlaylistServiceImpl implements PlaylistService {
                 .orElseThrow(() -> new ResourceNotFoundException("Playlist not found"));
 
         PlaylistDetailDTO dto = new PlaylistDetailDTO();
-        dto.id = playlist.getId();
-        dto.name = playlist.getName();
-        dto.description = playlist.getDescription();
-        dto.isPublic = playlist.isPublic();
+        dto.setId(playlist.getId());
+        dto.setName(playlist.getName());
+        dto.setDescription(playlist.getDescription());
+        dto.setPublic(playlist.isPublic());
 
-        dto.tracks = playlistTrackRepository.findPlaylistTrackDTOs(playlistId);
+        dto.setTracks(
+                playlistTrackRepository
+                        .findWithTrackAndArtistsByPlaylistId(playlistId)
+                        .stream()
+                        .map(pt -> {
+                            Track t = pt.getTrack();
+
+                            PlaylistTrackDTO trackDto = new PlaylistTrackDTO();
+                            trackDto.setId(t.getId());
+                            trackDto.setTitle(t.getTitle());
+                            trackDto.setDurationSec(t.getDurationSec());
+                            trackDto.setPosition(pt.getPosition());
+
+                            // 🔥 MULTIPLE ARTISTS (FIX)
+                            trackDto.setArtists(
+                                    t.getArtists()
+                                            .stream()
+                                            .map(a -> new com.AETHER.music.DTO.artist.ArtistDTO(
+                                                    a.getId(),
+                                                    a.getName(),
+                                                    a.getCountry()
+                                            ))
+                                            .toList()
+                            );
+
+                            return trackDto;
+                        })
+                        .toList()
+        );
 
         return dto;
     }
+
 
     @Override
     @Transactional(readOnly = true)
@@ -93,7 +122,7 @@ public class PlaylistServiceImpl implements PlaylistService {
         PlaylistTrack pt = new PlaylistTrack();
         pt.setPlaylist(playlist);
         pt.setTrack(new Track(trackId));
-        pt.setPosition(nextPosition);        // 🔥 THIS WAS MISSING
+        pt.setPosition(nextPosition);
         pt.setAddedAt(OffsetDateTime.now());
 
         playlistTrackRepository.save(pt);

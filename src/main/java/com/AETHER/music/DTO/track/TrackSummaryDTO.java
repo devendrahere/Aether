@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -15,7 +17,9 @@ public class TrackSummaryDTO {
     private Long id;
     private String title;
     private Integer durationSec;
-    private ArtistDTO artist;
+
+    // 🔥 THIS IS THE REAL FIX
+    private List<ArtistDTO> artists;
 
     public TrackSummaryDTO(Long id, String title, Integer durationSec) {
         this.id = id;
@@ -36,4 +40,3 @@ public class TrackSummaryDTO {
         return id != null ? id.hashCode() : 0;
     }
 }
-

@@ -1,32 +1,22 @@
 package com.AETHER.music.DTO.playlist;
 
+import com.AETHER.music.DTO.artist.ArtistDTO;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.List;
+
+@Getter
+@Setter
 public class PlaylistTrackDTO {
 
-    public Long id;
-    public String title;
-    public Integer durationSec;
-    public Artist artist;
+    private Long id;
+    private String title;
+    private Integer durationSec;
 
-    public PlaylistTrackDTO(
-            Long id,
-            String title,
-            Integer durationSec,
-            Long artistId,
-            String artistName
-    ) {
-        this.id = id;
-        this.title = title;
-        this.durationSec = durationSec;
-        this.artist = new Artist(artistId, artistName);
-    }
+    // REQUIRED for playlists
+    private int position;
 
-    public static class Artist {
-        public Long id;
-        public String name;
-
-        public Artist(Long id, String name) {
-            this.id = id;
-            this.name = name;
-        }
-    }
+    // MULTIPLE ARTISTS (truthful model)
+    private List<ArtistDTO> artists;
 }

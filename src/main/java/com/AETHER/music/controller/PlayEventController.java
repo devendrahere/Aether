@@ -3,6 +3,8 @@ package com.AETHER.music.controller;
 import com.AETHER.music.DTO.playevent.PlayEventRequestDTO;
 import com.AETHER.music.auth.CustomUserDetails;
 import com.AETHER.music.service.PlayEventService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,9 +18,10 @@ public class PlayEventController {
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void record(
             Authentication authentication,
-            @RequestBody PlayEventRequestDTO dto
+            @Valid @RequestBody PlayEventRequestDTO dto
     ){
         System.out.println(">>> PlayEventController HIT");
         Long userId = null;

@@ -15,24 +15,21 @@ public interface TrackRepository extends JpaRepository<Track, Long> {
 
     List<Track> findByAlbumId(Long albumId);
 
-    List<Track> findByArtistId(Long artistId);
+    List<Track> findByArtists_Id(Long artistId);
 
     @Query("""
-        select t from Track t
-        join fetch t.artist
+        select distinct t
+        from Track t
+        join fetch t.artists
         where lower(t.title) like lower(concat('%', :q, '%'))
     """)
     List<Track> search(@Param("q") String query);
 
     @Query("""
-    select new com.AETHER.music.DTO.track.TrackSummaryDTO(
-        t.id,
-        t.title,
-        t.durationSec
-    )
+    select distinct t
     from Track t
-    join t.artist a
+    join fetch t.artists
     where t.id in :ids
 """)
-    List<TrackSummaryDTO> findTrackSummariesByIds(@Param("ids") List<Long> ids);
+    List<Track> findWithArtistsByIdIn(@Param("ids") List<Long> ids);
 }

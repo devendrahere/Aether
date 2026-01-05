@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.OffsetDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "artists")
@@ -25,8 +27,9 @@ public class Artist {
     @Column(length = 100)
     private String country;
 
+    @ManyToMany(mappedBy = "artists", fetch = FetchType.LAZY)
+    private Set<Track> tracks = new HashSet<>();
+
     @Column(name = "created_at", nullable = false)
     private OffsetDateTime createdAt = OffsetDateTime.now();
-
-    // getters/setters
 }

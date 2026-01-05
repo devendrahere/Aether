@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.OffsetDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "tracks")
@@ -19,9 +21,13 @@ public class Track {
     @Column(name = "discogs_id")
     private Long discogsId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "artist_id", nullable = false)
-    private Artist artist;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "track_artists",
+            joinColumns = @JoinColumn(name = "track_id"),
+            inverseJoinColumns = @JoinColumn(name = "artist_id")
+    )
+    private Set<Artist> artists = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "album_id")
@@ -36,13 +42,9 @@ public class Track {
     @Column(name = "created_at", nullable = false)
     private OffsetDateTime createdAt = OffsetDateTime.now();
 
+    public Track() {}
 
     public Track(Long id) {
         this.id = id;
     }
-
-    public Track() {}
-
-    // getters/setters
 }
-

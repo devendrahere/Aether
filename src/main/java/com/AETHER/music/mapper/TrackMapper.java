@@ -14,11 +14,18 @@ public class TrackMapper {
     public TrackSummaryDTO toSummaryDTO(Track track) {
         if (track == null) return null;
 
-        return new TrackSummaryDTO(
-                track.getId(),
-                track.getTitle(),
-                track.getDurationSec(),
-                artistMapper.toDTO(track.getArtist())
+        TrackSummaryDTO dto = new TrackSummaryDTO();
+        dto.setId(track.getId());
+        dto.setTitle(track.getTitle());
+        dto.setDurationSec(track.getDurationSec());
+
+        dto.setArtists(
+                track.getArtists()
+                        .stream()
+                        .map(artistMapper::toDTO)
+                        .toList()
         );
+
+        return dto;
     }
 }
