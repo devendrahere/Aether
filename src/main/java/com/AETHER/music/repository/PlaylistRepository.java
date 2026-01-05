@@ -32,4 +32,14 @@ public interface PlaylistRepository extends JpaRepository<Playlist, Long> {
     order by p.createdAt desc
 """)
     List<PlaylistSummaryDTO> findPlaylistSummaries(@Param("userId") Long userId);
+
+    @Query("""
+        select new com.AETHER.music.DTO.playlist.PlaylistSummaryDTO(
+            p.id,
+            p.name
+        )
+        from Playlist p
+        where p.id = :playlistId
+    """)
+    PlaylistSummaryDTO findSummaryById(Long playlistId);
 }

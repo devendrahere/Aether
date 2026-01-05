@@ -8,6 +8,7 @@ import com.AETHER.music.DTO.playlist.PlaylistSummaryDTO;
 import com.AETHER.music.DTO.track.TrackSummaryDTO;
 import com.AETHER.music.mapper.TrackMapper;
 import com.AETHER.music.repository.PlayEventRepository;
+import com.AETHER.music.repository.PlaylistRepository;
 import com.AETHER.music.repository.TrackRepository;
 import com.AETHER.music.service.HomeService;
 import com.AETHER.music.service.TrackFeedService;
@@ -36,17 +37,20 @@ public class HomeServiceImpl implements HomeService {
     private final TrackRepository trackRepository;
     private final TrackFeedService trackFeedService;
     private final TrackMapper trackMapper;
+    private final PlaylistRepository playlistRepository;
+
 
     public HomeServiceImpl(
             RedisTemplate<String, Long> redisTemplate,
             PlayEventRepository playEventRepository,
-            TrackRepository trackRepository, TrackFeedService trackFeedService, TrackMapper trackMapper
+            TrackRepository trackRepository, TrackFeedService trackFeedService, TrackMapper trackMapper, PlaylistRepository playlistRepository
     ) {
         this.redisTemplate = redisTemplate;
         this.playEventRepository = playEventRepository;
         this.trackRepository = trackRepository;
         this.trackFeedService = trackFeedService;
         this.trackMapper = trackMapper;
+        this.playlistRepository = playlistRepository;
     }
 
     @Override
@@ -90,10 +94,15 @@ public class HomeServiceImpl implements HomeService {
             return new HomeSectionDTO(type, title, List.of());
         }
 
-        // 🔥 Fetch entities with artists
-        var tracks = trackRepository.findWithArtistsByIdIn(trackIds);
+        // ✅ 1️⃣ DEDUPLICATE while preserving Redis order
+        List<Long> uniqueIds = trackIds.stream()
+                .distinct()
+                .toList();
 
-        // Map entity → DTO
+        // ✅ 2️⃣ Fetch entities with artists
+        var tracks = trackRepository.findWithArtistsByIdIn(uniqueIds);
+
+        // ✅ 3️⃣ Map entity → DTO
         Map<Long, TrackSummaryDTO> map =
                 tracks.stream()
                         .map(trackMapper::toSummaryDTO)
@@ -102,15 +111,16 @@ public class HomeServiceImpl implements HomeService {
                                 dto -> dto
                         ));
 
-        // Preserve order from Redis / feed
+        // ✅ 4️⃣ Preserve Redis order EXACTLY
         List<TrackSummaryDTO> ordered =
-                trackIds.stream()
+                uniqueIds.stream()
                         .map(map::get)
                         .filter(Objects::nonNull)
                         .toList();
 
         return new HomeSectionDTO(type, title, ordered);
     }
+
 
     @SuppressWarnings("unchecked")
     private List<Long> getRecentTrackIdsFromCache(String key) {
@@ -139,15 +149,23 @@ public class HomeServiceImpl implements HomeService {
             return new HomeHeroDTO("Welcome to Aether", null);
         }
 
-        List<PlaylistSummaryDTO> playlists =
-                playEventRepository.findRecentlyPlayedPlaylistSummary(
-                        userId,
-                        Pageable.ofSize(1)
-                );
+        String key = "recent:playlists:user:" + userId;
+
+        List<Long> playlistIds =
+                redisTemplate.opsForList().range(key, 0, -1);
+
+        if (playlistIds == null || playlistIds.isEmpty()) {
+            return new HomeHeroDTO("Good to see you again", null);
+        }
+
+        Long latestPlaylistId = playlistIds.get(0);
+
+        PlaylistSummaryDTO playlist =
+                playlistRepository.findSummaryById(latestPlaylistId);
 
         return new HomeHeroDTO(
                 "Good to see you again",
-                playlists.isEmpty() ? null : playlists.get(0)
+                playlist
         );
     }
 

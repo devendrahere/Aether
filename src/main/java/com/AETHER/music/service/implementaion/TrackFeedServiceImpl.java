@@ -36,7 +36,8 @@ public class TrackFeedServiceImpl implements TrackFeedService {
             return List.of();
         }
 
-        String key = "home:tracks:recent:user:" + userId;
+        // 🔥 FIX: USE THE SAME KEY AS PLAY-EVENT WRITES
+        String key = "recent:tracks:user:" + userId;
 
         List<Long> cached =
                 redisTemplate.opsForList().range(key, 0, -1);
@@ -45,6 +46,7 @@ public class TrackFeedServiceImpl implements TrackFeedService {
             return cached;
         }
 
+        // Fallback ONLY if Redis is empty
         List<Long> trackIds =
                 playEventRepository.findRecentDistinctTrackIdsByUser(
                         userId,
@@ -87,3 +89,4 @@ public class TrackFeedServiceImpl implements TrackFeedService {
         return trackIds;
     }
 }
+

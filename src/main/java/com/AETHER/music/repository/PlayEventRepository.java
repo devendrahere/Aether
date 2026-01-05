@@ -51,23 +51,4 @@ public interface PlayEventRepository extends JpaRepository<PlayEvent, Long> {
             Pageable pageable
     );
 
-    @Query("""
-    select new com.AETHER.music.DTO.playlist.PlaylistSummaryDTO(
-        p.id,
-        p.name,
-        p.isPublic,
-        count(distinct pe.track.id)
-    )
-    from PlayEvent pe
-    join pe.playlist p
-    where pe.user.id = :userId
-      and pe.eventType = com.AETHER.music.entity.PlayEventType.PLAY
-      and pe.playlist is not null
-    group by p.id, p.name, p.isPublic
-    order by max(pe.eventTime) desc
-""")
-    List<PlaylistSummaryDTO> findRecentlyPlayedPlaylistSummary(
-            @Param("userId") Long userId,
-            Pageable pageable
-    );
 }

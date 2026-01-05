@@ -53,7 +53,7 @@ public class SecurityConfig {
                                 "/albums/**",
                                 "/home"
                         ).permitAll()
-                        .requestMatchers(HttpMethod.POST, "/play-event").hasRole("USER")
+                        .requestMatchers(HttpMethod.POST, "/play-event").permitAll()
                         .requestMatchers(
                                 "/tracks/*/stream"
                         ).permitAll()

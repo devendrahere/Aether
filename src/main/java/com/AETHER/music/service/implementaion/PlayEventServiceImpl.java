@@ -68,7 +68,7 @@ public class PlayEventServiceImpl implements PlayEventService {
         // Publish only meaningful signal
         if (userId != null && dto.eventType == PlayEventType.PLAY) {
             eventPublisher.publishEvent(
-                    new PlayEventRecorded(userId, dto.trackId)
+                    new PlayEventRecorded(userId, dto.trackId,dto.playlistId)
             );
         }
     }
