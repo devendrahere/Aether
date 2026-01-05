@@ -52,8 +52,8 @@ Aether Music is a lossless music streaming application backend built with Spring
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/your-username/aether-music-backend.git
-   cd aether-music-backend
+   git clone https://github.com/devendrahere/Aether.git
+   cd Aether
    ```
 
 2. **Install dependencies**:
