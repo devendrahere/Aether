@@ -18,7 +18,7 @@ import java.util.List;
 public class UserLibraryController {
 
     private final ReactionService reactionService;
-    private final TrackMapper trackMapper; // you already map Track → DTO
+    private final TrackMapper trackMapper;
 
     @GetMapping("/liked-tracks")
     public List<TrackSummaryDTO> likedTracks(

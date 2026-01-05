@@ -21,8 +21,6 @@ public class CustomUserDetails implements UserDetails {
         this.email = user.getEmail();
         this.passwordHash = user.getPasswordHash();
     }
-
-    // CANONICAL ID ACCESS
     public Long getId() {
         return id;
     }

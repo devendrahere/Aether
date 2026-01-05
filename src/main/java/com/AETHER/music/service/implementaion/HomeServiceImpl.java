@@ -94,15 +94,15 @@ public class HomeServiceImpl implements HomeService {
             return new HomeSectionDTO(type, title, List.of());
         }
 
-        // ✅ 1️⃣ DEDUPLICATE while preserving Redis order
+        // DEDUPLICATE while preserving Redis order
         List<Long> uniqueIds = trackIds.stream()
                 .distinct()
                 .toList();
 
-        // ✅ 2️⃣ Fetch entities with artists
+        // Fetch entities with artists
         var tracks = trackRepository.findWithArtistsByIdIn(uniqueIds);
 
-        // ✅ 3️⃣ Map entity → DTO
+        // ⃣Map entity → DTO
         Map<Long, TrackSummaryDTO> map =
                 tracks.stream()
                         .map(trackMapper::toSummaryDTO)
@@ -111,7 +111,7 @@ public class HomeServiceImpl implements HomeService {
                                 dto -> dto
                         ));
 
-        // ✅ 4️⃣ Preserve Redis order EXACTLY
+        // Preserve Redis order EXACTLY
         List<TrackSummaryDTO> ordered =
                 uniqueIds.stream()
                         .map(map::get)

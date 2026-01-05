@@ -43,7 +43,7 @@ public class TrackServiceImpl implements TrackService {
         dto.setTitle(track.getTitle());
         dto.setDurationSec(track.getDurationSec());
 
-        // 🔥 Artists (FIX)
+        // Artists (FIX)
         dto.setArtists(
                 track.getArtists()
                         .stream()
@@ -125,7 +125,7 @@ public class TrackServiceImpl implements TrackService {
                     dto.setTitle(track.getTitle());
                     dto.setDurationSec(track.getDurationSec());
 
-                    // 🔥 Artists (FIX)
+                    // Artists (FIX)
                     dto.setArtists(
                             track.getArtists()
                                     .stream()

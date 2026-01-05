@@ -18,7 +18,6 @@ public class TrackSummaryDTO {
     private String title;
     private Integer durationSec;
 
-    // 🔥 THIS IS THE REAL FIX
     private List<ArtistDTO> artists;
 
     public TrackSummaryDTO(Long id, String title, Integer durationSec) {

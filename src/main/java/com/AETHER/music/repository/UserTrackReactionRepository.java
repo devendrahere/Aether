@@ -16,14 +16,12 @@ import java.util.Optional;
 public interface UserTrackReactionRepository
         extends JpaRepository<UserTrackReaction, UserTrackReactionId> {
 
-    // ===== write / existence checks (entities are OK here) =====
     boolean existsByUserIdAndTrackId(Long userId, Long trackId);
 
     Optional<UserTrackReaction> findByUserIdAndTrackId(Long userId, Long trackId);
 
     long countByTrackIdAndReactionType(Long trackId, ReactionType reactionType);
 
-    // ===== read API: DTO projection (THIS FIXES YOUR CRASH) =====
     @Query("""
         select new com.AETHER.music.DTO.track.TrackSummaryDTO(
             t.id,
