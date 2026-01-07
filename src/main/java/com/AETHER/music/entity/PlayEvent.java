@@ -18,6 +18,10 @@ import java.util.UUID;
                 @Index(
                         name = "idx_play_events_user_playlist_time",
                         columnList = "user_id, playlist_id, event_time desc"
+                ),
+                @Index(
+                        name = "idx_play_events_user_album_time",
+                        columnList = "user_id, album_id, event_time desc"
                 )
         }
 )
@@ -50,6 +54,11 @@ public class PlayEvent {
 
     @Column(name = "event_time", nullable = false, updatable = false)
     private OffsetDateTime eventTime;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "album_id")
+    private Album album; // nullable
+
 
     @PrePersist
     void onCreate() {

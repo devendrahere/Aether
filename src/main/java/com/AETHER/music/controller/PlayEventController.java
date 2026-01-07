@@ -22,13 +22,14 @@ public class PlayEventController {
     public void record(
             Authentication authentication,
             @Valid @RequestBody PlayEventRequestDTO dto
-    ){
+    ) {
         System.out.println(">>> PlayEventController HIT");
+
         Long userId = null;
 
-        if (authentication != null && authentication.isAuthenticated()) {
-            CustomUserDetails user =
-                    (CustomUserDetails) authentication.getPrincipal();
+        if (authentication != null &&
+                authentication.getPrincipal() instanceof CustomUserDetails user) {
+
             userId = user.getId();
         }
 

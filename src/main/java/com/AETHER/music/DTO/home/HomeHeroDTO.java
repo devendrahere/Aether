@@ -1,8 +1,8 @@
 package com.AETHER.music.DTO.home;
 
-import com.AETHER.music.DTO.playlist.PlaylistSummaryDTO;
+import java.util.List;
+
 public record HomeHeroDTO(
         String greeting,
-        PlaylistSummaryDTO featuredPlaylist
+        List<HomeHeroContextDTO> context
 ) {}
-

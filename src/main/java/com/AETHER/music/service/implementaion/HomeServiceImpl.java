@@ -7,6 +7,7 @@ import com.AETHER.music.DTO.home.HomeSectionType;
 import com.AETHER.music.DTO.playlist.PlaylistSummaryDTO;
 import com.AETHER.music.DTO.track.TrackSummaryDTO;
 import com.AETHER.music.mapper.TrackMapper;
+import com.AETHER.music.repository.AlbumRepository;
 import com.AETHER.music.repository.PlayEventRepository;
 import com.AETHER.music.repository.PlaylistRepository;
 import com.AETHER.music.repository.TrackRepository;
@@ -16,6 +17,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.AETHER.music.DTO.home.HomeHeroContextDTO;
+import com.AETHER.music.DTO.home.HomeHeroContextType;
+
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -30,6 +34,10 @@ public class HomeServiceImpl implements HomeService {
 
     private static final String GLOBAL_HOME_KEY = "home:top:tracks";
     private static final Duration GLOBAL_HOME_TTL = Duration.ofMinutes(5);
+    private static final int HERO_TOTAL_LIMIT = 5;
+    private static final int HERO_PLAYLIST_LIMIT = 2;
+    private static final int HERO_ALBUM_LIMIT = 3;
+
     private static final int HOME_LIMIT = 10;
 
     private final RedisTemplate<String, Long> redisTemplate;
@@ -38,12 +46,13 @@ public class HomeServiceImpl implements HomeService {
     private final TrackFeedService trackFeedService;
     private final TrackMapper trackMapper;
     private final PlaylistRepository playlistRepository;
+    private final AlbumRepository albumRepository;
 
 
     public HomeServiceImpl(
             RedisTemplate<String, Long> redisTemplate,
             PlayEventRepository playEventRepository,
-            TrackRepository trackRepository, TrackFeedService trackFeedService, TrackMapper trackMapper, PlaylistRepository playlistRepository
+            TrackRepository trackRepository, TrackFeedService trackFeedService, TrackMapper trackMapper, PlaylistRepository playlistRepository, AlbumRepository albumRepository
     ) {
         this.redisTemplate = redisTemplate;
         this.playEventRepository = playEventRepository;
@@ -51,6 +60,8 @@ public class HomeServiceImpl implements HomeService {
         this.trackFeedService = trackFeedService;
         this.trackMapper = trackMapper;
         this.playlistRepository = playlistRepository;
+
+        this.albumRepository = albumRepository;
     }
 
     @Override
@@ -148,25 +159,48 @@ public class HomeServiceImpl implements HomeService {
         if (userId == null) {
             return new HomeHeroDTO("Welcome to Aether", null);
         }
+        List<HomeHeroContextDTO> items=new ArrayList<>();
 
-        String key = "recent:playlists:user:" + userId;
+        List<Long> playlistIds=redisTemplate.opsForList().range("recent:playlists:user:" + userId, 0, HERO_PLAYLIST_LIMIT - 1);
+        // Fetch latest playlist & album
+//        Long latestPlaylistId =
+//                redisTemplate.opsForList()
+//                        .index("recent:playlists:user:" + userId, 0);
+        //^old logic
 
-        List<Long> playlistIds =
-                redisTemplate.opsForList().range(key, 0, -1);
-
-        if (playlistIds == null || playlistIds.isEmpty()) {
-            return new HomeHeroDTO("Good to see you again", null);
+        //new logic
+        if (playlistIds != null) {
+            playlistIds.forEach(id -> {
+                playlistRepository.findById(id).ifPresent(playlist ->
+                        items.add(new HomeHeroContextDTO(
+                                HomeHeroContextType.PLAYLIST,
+                                id,
+                                playlist.getName()
+                        ))
+                );
+            });
         }
 
-        Long latestPlaylistId = playlistIds.get(0);
 
-        PlaylistSummaryDTO playlist =
-                playlistRepository.findSummaryById(latestPlaylistId);
+        List<Long> albumIds=redisTemplate.opsForList().range("recent:albums:user:" + userId, 0, HERO_ALBUM_LIMIT - 1);
 
+        //fetching recently played albums
+        if(albumIds!=null){
+            albumIds.forEach(id->{
+                items.add(new HomeHeroContextDTO(
+                        HomeHeroContextType.ALBUM,
+                        id,
+                        "Album "+albumRepository.findById(id).get().getTitle()
+                ));
+            });
+        }
+
+
+        // Album fallback (you'll add AlbumSummaryDTO next)
         return new HomeHeroDTO(
-                "Good to see you again",
-                playlist
+                "Continue listening",
+                items
         );
-    }
 
+    }
 }

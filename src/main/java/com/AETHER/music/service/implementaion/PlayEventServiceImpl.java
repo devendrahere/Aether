@@ -41,6 +41,7 @@ public class PlayEventServiceImpl implements PlayEventService {
     public void record(PlayEventRequestDTO dto, Long userId) {
 
         PlayEvent event = new PlayEvent();
+        var track=trackRepository.getReferenceById(dto.trackId);
 
         // Track (mandatory)
         event.setTrack(trackRepository.getReferenceById(dto.trackId));
@@ -64,11 +65,20 @@ public class PlayEventServiceImpl implements PlayEventService {
         }
 
         playEventRepository.save(event);
-
+        Long albumId=dto.albumId != null
+                ? dto.albumId
+                : track.getAlbum() != null
+                ? track.getAlbum().getId()
+                : null;
         // Publish only meaningful signal
         if (userId != null && dto.eventType == PlayEventType.PLAY) {
             eventPublisher.publishEvent(
-                    new PlayEventRecorded(userId, dto.trackId,dto.playlistId)
+                    new PlayEventRecorded(
+                            userId,
+                            dto.trackId,
+                            dto.playlistId,
+                            albumId
+                    )
             );
         }
     }

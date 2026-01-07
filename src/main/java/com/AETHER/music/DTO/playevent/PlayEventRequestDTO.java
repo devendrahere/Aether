@@ -13,6 +13,7 @@ public class PlayEventRequestDTO {
     public Long trackId;
 
     public Long playlistId;
+    public Long albumId;
 
     @NotNull
     public PlayEventType eventType;
