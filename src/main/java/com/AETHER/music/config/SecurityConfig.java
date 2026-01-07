@@ -34,7 +34,7 @@ public class SecurityConfig {
     ) throws Exception {
 
         http
-                .cors(withDefaults())   // ✅ USE CorsConfigurationSource
+                .cors(withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(sm ->
                         sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)

@@ -1,9 +1,12 @@
 package com.AETHER.music.service.implementaion;
 
+import com.AETHER.music.DTO.artist.ArtistDTO;
 import com.AETHER.music.DTO.track.TrackSummaryDTO;
 import com.AETHER.music.entity.ReactionType;
 import com.AETHER.music.entity.UserTrackReaction;
 import com.AETHER.music.entity.UserTrackReactionId;
+import com.AETHER.music.mapper.ArtistMapper;
+import com.AETHER.music.mapper.TrackMapper;
 import com.AETHER.music.repository.TrackRepository;
 import com.AETHER.music.repository.UserRepository;
 import com.AETHER.music.repository.UserTrackReactionRepository;
@@ -22,6 +25,7 @@ public class ReactionServiceImpl implements ReactionService {
     private final UserTrackReactionRepository reactionRepo;
     private final UserRepository userRepo;
     private final TrackRepository trackRepo;
+    private final TrackMapper trackMapper;
 
     @Override
     @Transactional
@@ -34,9 +38,10 @@ public class ReactionServiceImpl implements ReactionService {
         UserTrackReaction reaction = reactionRepo.findById(id)
                 .orElseGet(() -> {
                     UserTrackReaction r = new UserTrackReaction();
-                    r.setId(id); // 🔥 THIS WAS MISSING
+                    r.setId(id);
                     r.setUser(userRepo.getReferenceById(userId));
                     r.setTrack(trackRepo.getReferenceById(trackId));
+
                     return r;
                 });
 
@@ -53,7 +58,10 @@ public class ReactionServiceImpl implements ReactionService {
     @Override
     @Transactional(readOnly = true)
     public List<TrackSummaryDTO> getLikedTracks(Long userId) {
-        return reactionRepo.findLikedTrackSummaries(userId, ReactionType.LIKE);
+        return reactionRepo
+                .findLikedTracksWithArtists(userId, ReactionType.LIKE)
+                .stream()
+                .map(trackMapper::toSummaryDTO)
+                .toList();
     }
-
 }

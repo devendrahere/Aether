@@ -7,7 +7,7 @@ public class PlaylistSummaryDTO {
     public boolean isPublic;
     public int trackCount;
 
-    // ✅ REQUIRED FOR HOME HERO QUERY
+
     public PlaylistSummaryDTO(Long id, String name) {
         this.id = id;
         this.name = name;

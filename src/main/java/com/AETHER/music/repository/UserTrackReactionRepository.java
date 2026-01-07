@@ -2,6 +2,7 @@ package com.AETHER.music.repository;
 
 import com.AETHER.music.DTO.track.TrackSummaryDTO;
 import com.AETHER.music.entity.ReactionType;
+import com.AETHER.music.entity.Track;
 import com.AETHER.music.entity.UserTrackReaction;
 import com.AETHER.music.entity.UserTrackReactionId;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -37,4 +38,18 @@ public interface UserTrackReactionRepository
             @Param("userId") Long userId,
             @Param("reaction") ReactionType reaction
     );
+
+    @Query("""
+    select distinct t
+    from UserTrackReaction r
+    join r.track t
+    join fetch t.artists
+    where r.user.id = :userId
+      and r.reactionType = :reaction
+""")
+    List<Track> findLikedTracksWithArtists(
+            Long userId,
+            ReactionType reaction
+    );
+
 }

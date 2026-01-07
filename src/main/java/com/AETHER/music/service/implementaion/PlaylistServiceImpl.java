@@ -78,7 +78,6 @@ public class PlaylistServiceImpl implements PlaylistService {
                             trackDto.setDurationSec(t.getDurationSec());
                             trackDto.setPosition(pt.getPosition());
 
-                            // 🔥 MULTIPLE ARTISTS (FIX)
                             trackDto.setArtists(
                                     t.getArtists()
                                             .stream()

@@ -96,7 +96,6 @@ public class TrackServiceImpl implements TrackService {
                     dto.setTitle(track.getTitle());
                     dto.setDurationSec(track.getDurationSec());
 
-                    // 🔥 Artists (FIX)
                     dto.setArtists(
                             track.getArtists()
                                     .stream()

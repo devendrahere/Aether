@@ -80,7 +80,7 @@ public class UserServiceImpl implements UserService {
             Authentication authentication =
                     authenticationManager.authenticate(
                             new UsernamePasswordAuthenticationToken(
-                                    user.getUsername(),   // 🔥 canonical
+                                    user.getUsername(),
                                     dto.password
                             )
                     );
